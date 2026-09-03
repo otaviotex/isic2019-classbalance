@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Dataset (não versionar - muito grande)
+data/
+archive/
+*.jpg
+*.jpeg
+*.png
+
+# Exceção: mantém imagens de exemplo/documentação se precisar
+!docs/**/*.png
+
+# Checkpoints e logs de treinamento
+checkpoints/
+runs/
+*.pth
+*.pt
+
+# Configs locais com dados sensíveis (se houver)
+.env
