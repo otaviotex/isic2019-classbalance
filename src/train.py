@@ -55,16 +55,21 @@ def validar(model, dataloader, criterion, device):
     return perda_total / total, acertos / total
 
 
-def treinar_baseline(model, train_loader, val_loader, device,
-                      num_epochs=10, lr=1e-4, checkpoint_path="checkpoints/baseline_best.pth"):
+def treinar_modelo(model, train_loader, val_loader, device, criterion=None,
+                    num_epochs=5, lr=1e-4, checkpoint_path="checkpoints/model_best.pth"):
     """
-    Treina o modelo baseline com CrossEntropyLoss padrão (sem tratamento de
-    desbalanceamento). Salva o melhor checkpoint com base na perda de validação.
+    Treina o modelo com o criterion (função de perda) fornecido.
+    Salva o melhor checkpoint com base na perda de validação.
+
+    Args:
+        criterion: função de perda (ex: nn.CrossEntropyLoss(), nn.CrossEntropyLoss(weight=...),
+                   FocalLoss(...)). Se None, usa CrossEntropyLoss() padrão (comportamento do baseline).
     """
     import os
     os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
 
-    criterion = nn.CrossEntropyLoss()
+    if criterion is None:
+        criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     melhor_perda_val = float("inf")
@@ -94,3 +99,15 @@ def treinar_baseline(model, train_loader, val_loader, device,
             print(f"  -> Novo melhor modelo salvo em {checkpoint_path}")
 
     return historico
+
+
+def treinar_baseline(model, train_loader, val_loader, device,
+                      num_epochs=5, lr=1e-4, checkpoint_path="checkpoints/baseline_best.pth"):
+    """
+    Treina o modelo baseline com CrossEntropyLoss padrão (sem tratamento de
+    desbalanceamento). Mantido por compatibilidade — equivale a chamar
+    treinar_modelo(..., criterion=None).
+    """
+    return treinar_modelo(model, train_loader, val_loader, device,
+                           criterion=None, num_epochs=num_epochs, lr=lr,
+                           checkpoint_path=checkpoint_path)
